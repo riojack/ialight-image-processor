@@ -1,0 +1,11 @@
+{
+  "name": "ialight-image-processor",
+  "version": "1.0.0",
+  "description": "Processes photographs into different sizes.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "riojack <riojack@users.noreply.github.com>",
+  "license": "ISC"
+}
