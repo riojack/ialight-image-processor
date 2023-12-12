@@ -4,8 +4,15 @@
   "description": "Processes photographs into different sizes.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "cdk": "cdk"
   },
   "author": "riojack <riojack@users.noreply.github.com>",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.10.4",
+    "aws-cdk-lib": "^2.114.1",
+    "typescript": "^5.3.3"
+  }
 }
