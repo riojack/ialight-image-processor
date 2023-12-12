@@ -6,7 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
-    "cdk": "cdk"
+    "cdk": "cdk",
+    "predeploy": "npm run build",
+    "deploy": "cdk deploy"
   },
   "author": "riojack <riojack@users.noreply.github.com>",
   "license": "ISC",
