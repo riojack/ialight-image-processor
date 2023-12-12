@@ -1,0 +1,30 @@
+name: Build & deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.GH_AWS_A_KEY }}
+          aws-secret-access-key: ${{ secrets.GH_AWS_A_SECRET }}
+          aws-region: us-east-1
+      - name: Prereqs
+        run: |
+          sudo npm install -g aws-cdk@2.114.1
+          cdk --version
+      - name: Dependencies
+        run: npm install
+      - name: Deploy
+        run: |
+          cd $GITHUB_WORKSPACE
+          npm run deploy
+
+
