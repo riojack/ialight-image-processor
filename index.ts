@@ -9,7 +9,7 @@ export class IaLightImageProcessorStack extends cdk.Stack {
 
     new lambda.Function(this, 'Proc', {
       code: new lambda.InlineCode(fs.readFileSync('handler.js', { encoding: 'utf-8' })),
-      handler: 'handler.handler',
+      handler: 'index.handler',
       timeout: cdk.Duration.seconds(300),
       runtime: lambda.Runtime.NODEJS_20_X,
     });
