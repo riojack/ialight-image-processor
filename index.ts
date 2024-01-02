@@ -1,18 +1,32 @@
-import lambda = require('aws-cdk-lib/aws-lambda');
 import cdk = require('aws-cdk-lib');
-
+import sqs = require('aws-cdk-lib/aws-sqs');
+import lambda = require('aws-cdk-lib/aws-lambda');
+import core = require('aws-cdk-lib/core');
+import lambdaEventSources = require('aws-cdk-lib/aws-lambda-event-sources');
 import fs = require('fs');
 
 export class IaLightImageProcessorStack extends cdk.Stack {
   constructor(app: cdk.App, id: string) {
     super(app, id);
 
-    new lambda.Function(this, 'Proc', {
+    const imagePathQueue = new sqs.Queue(this, 'ialight-image-path-queue', {
+      queueName: 'ialight-image-path-queue',
+      visibilityTimeout: cdk.Duration.seconds(300),
+      deliveryDelay: cdk.Duration.seconds(10)
+    });
+    core.Tags.of(imagePathQueue).add('description', 'Each item in this queue is the S3 path to the image to be processed.');
+
+    const imageProcLambda = new lambda.Function(this, 'Proc', {
       code: new lambda.InlineCode(fs.readFileSync('handler.js', { encoding: 'utf-8' })),
       handler: 'index.handler',
       timeout: cdk.Duration.seconds(300),
       runtime: lambda.Runtime.NODEJS_20_X,
     });
+    core.Tags.of(imageProcLambda).add('description', 'Consumes an SQS record with an S3 path to an image to processed.  Applies various image transformations.');
+
+    const evtImagePathQueueToImageProcLambda = new lambdaEventSources.SqsEventSource(imagePathQueue);
+
+    imageProcLambda.addEventSource(evtImagePathQueueToImageProcLambda);
   }
 }
 
