@@ -11,5 +11,6 @@ exports.handler = async function(event: SQSEvent, context: Context) {
         const cmd = new GetObjectCommand({Bucket:'iowalight.com', Key: record.body});
         const obj = await s3.send(cmd);
         console.log(obj.ContentLength);
+        console.log(gm);
     }
 };
