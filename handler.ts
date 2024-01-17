@@ -1,5 +1,7 @@
 import {SQSEvent, Context} from 'aws-lambda';
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
+const fs = require('fs')
+const gm = require('gm').subClass({ imageMagick: '7+' });
 
 const s3 = new S3Client({});
 
