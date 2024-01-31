@@ -1,7 +1,7 @@
 import { SQSEvent, Context } from 'aws-lambda';
 import { NodeJsClient } from "@smithy/types";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
-import { Upload } from "@aws-sdk/lib-Storage";
+import { Upload } from "@aws-sdk/lib-storage";
 import { modifyImage } from "./helpers/images";
 const fs = require('fs')
 
