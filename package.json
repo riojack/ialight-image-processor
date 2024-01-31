@@ -23,6 +23,7 @@
         "typescript": "^5.3.3"
     },
     "dependencies": {
+        "@aws-sdk/lib-storage": "^3.503.1",
         "gm": "^1.25.0"
     }
 }
