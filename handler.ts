@@ -3,7 +3,7 @@ import { NodeJsClient } from "@smithy/types";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
 import { modifyImage } from "./helpers/images";
-const fs = require('fs')
+import fs from 'fs';
 
 const s3 = new S3Client({}) as NodeJsClient<S3Client>;
 
