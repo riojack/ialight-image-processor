@@ -5,11 +5,16 @@ import fs from "fs";
 const gm = require('gm').subClass({ imageMagick: '7+' });
 
 export async function modifyImage(stream: Stream): Promise<ReadableStream> {
-  return new Promise((done) => {
+  return new Promise((done, fail) => {
     gm(stream)
       .resize(100, 100)
       .stream(function (err: Error, stdout: ReadableStream, stderr: Stream) {
-        done(stdout);
+        if (err) {
+          fail(err);
+        }
+        else {
+          done(stdout);
+        }
       });
   });
 }
