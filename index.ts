@@ -23,6 +23,7 @@ export class IaLightImageProcessorStack extends cdk.Stack {
       timeout: cdk.Duration.seconds(300),
       runtime: lambda.Runtime.NODEJS_20_X,
       environment: {NODE_OPTIONS:"--enable-source-maps"},
+      ephemeralStorageSize: cdk.Size.mebibytes(2048),
       bundling: {
         sourceMap: true,
         minify: true
