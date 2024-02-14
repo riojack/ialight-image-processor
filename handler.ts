@@ -1,49 +1,44 @@
-import { SQSEvent, Context } from 'aws-lambda';
-import { NodeJsClient } from "@smithy/types";
-import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
+import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
-import { deleteFile, modifyImage } from "./helpers/images";
+import { NodeJsClient } from "@smithy/types";
+import { Context, SQSEvent } from 'aws-lambda';
 import fs from 'fs';
 import path from 'path';
 import util from 'util';
+import { modifyImage } from "./helpers/images";
 
 const s3 = new S3Client({}) as NodeJsClient<S3Client>;
-const {log} = console;
+
+const { log } = console;
+
+const readdirAsync = util.promisify(fs.readdir);
 
 exports.handler = async function (event: SQSEvent, context: Context) {
-    const writeFileAsync = util.promisify(fs.writeFile);
-    await writeFileAsync('/tmp/foo.txt', 'Hello, world!');
+    for (const record of event.Records) {
+        const s3filePath = record.body;
+        log(s3filePath);
 
-    const readdirAsync = util.promisify(fs.readdir);
-    const tmpFiles = await readdirAsync('/tmp');
-    log('Files in /tmp...');
-    for (const file of tmpFiles) {
-        log(`File: ${file}`);
+        const cmd = new GetObjectCommand({ Bucket: 'iowalight.com', Key: s3filePath });
+        const obj = await s3.send(cmd);
+        const extension = path.extname(s3filePath);
+        const fileName = path.parse(s3filePath).name;
+        const s3filePathnoext = path.basename(s3filePath, extension);
+        const news3filePath = `${s3filePathnoext}_100X100${extension}`;
+        const writeStream = fs.createWriteStream(`/tmp/image_${fileName}.jpg`);
+        obj.Body?.pipe(writeStream);
+        const bufImage = await modifyImage(writeStream);
+        log(bufImage);
+        log('---------------------');
+        const tmpFiles = await readdirAsync('/tmp');
+        log('Files in /tmp...');
+        for (const file of tmpFiles) {
+            log(`File: ${file}`);
+        }
+
+        const upload = new Upload({
+            client: s3,
+            params: { Bucket: 'iowalight.com', Key: news3filePath, Body: bufImage }
+        });
+        await upload.done();
     }
-
-    // fs.readdir("/tmp", (err, files) => {
-    //     files.forEach(file => {
-    //         log(file);
-    //     });
-    // });
-    // for (const record of event.Records) {
-    //     const s3filePath = record.body;
-    //     log(s3filePath);
-    //     const cmd = new GetObjectCommand({ Bucket: 'iowalight.com', Key: s3filePath });
-    //     const obj = await s3.send(cmd);
-    //     const extension = path.extname(s3filePath);
-    //     const fileName = path.parse(s3filePath).name;
-    //     const s3filePathnoext = path.basename(s3filePath, extension);
-    //     const news3filePath = `${s3filePathnoext}_100X100${extension}`;
-    //     const writeStream = fs.createWriteStream(`/tmp/image_${fileName}.jpg`);
-    //     obj.Body?.pipe(writeStream);
-    //     console.log(writeStream);
-    //     const BUF = await modifyImage(writeStream);
-    //     console.log(writeStream);
-    //     const upload = new Upload({
-    //         client: s3,
-    //         params: { Bucket: 'iowalight.com', Key: news3filePath, Body: BUF }
-    //     });
-    //     await upload.done();
-    // }
 };
