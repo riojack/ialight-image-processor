@@ -9,6 +9,11 @@ import path from 'path';
 const s3 = new S3Client({}) as NodeJsClient<S3Client>;
 
 exports.handler = async function (event: SQSEvent, context: Context) {
+    fs.readdir("/tmp", (err, files) => {
+        files.forEach(file => {
+            console.log(file);
+        });
+    });
     for (const record of event.Records) {
         const s3filePath = record.body;
         console.log(s3filePath);
