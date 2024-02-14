@@ -2,22 +2,28 @@ import { SQSEvent, Context } from 'aws-lambda';
 import { NodeJsClient } from "@smithy/types";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
-import { modifyImage } from "./helpers/images";
+import { deleteFile, modifyImage } from "./helpers/images";
 import fs from 'fs';
+import path from 'path';
 
 const s3 = new S3Client({}) as NodeJsClient<S3Client>;
 
 exports.handler = async function (event: SQSEvent, context: Context) {
     for (const record of event.Records) {
-        console.log(record.body);
-        const cmd = new GetObjectCommand({ Bucket: 'iowalight.com', Key: record.body });
+        const s3filePath = record.body;
+        console.log(s3filePath);
+        await deleteFile('./image.jpg');
+        const cmd = new GetObjectCommand({ Bucket: 'iowalight.com', Key: s3filePath });
         const obj = await s3.send(cmd);
         const writeStream = fs.createWriteStream('./image.jpg');
         obj.Body?.pipe(writeStream);
         const BUF = await modifyImage(writeStream);
+        const extension = path.extname(s3filePath);
+        const s3filePathnoext = path.basename(s3filePath, extension);
+        const news3filePath = `${s3filePathnoext}_100X100${extension}`;
         const upload = new Upload({
             client: s3,
-            params: { Bucket: 'iowalight.com', Key: `100X100_${record.body}`, Body: BUF }
+            params: { Bucket: 'iowalight.com', Key: news3filePath, Body: BUF }
         });
         await upload.done();
     }
