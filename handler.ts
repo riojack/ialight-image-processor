@@ -29,8 +29,7 @@ exports.handler = async function (event: SQSEvent, context: Context) {
         writeStream.close();
         const readStream = fs.createReadStream(`/tmp/image_${fileName}.jpg`);
         const bufImage = await modifyImage(readStream);
-        readStream.close();
-        log(bufImage);
+
         log('---------------------');
         const tmpFiles = await readdirAsync('/tmp');
         log('Files in /tmp...');
@@ -43,5 +42,6 @@ exports.handler = async function (event: SQSEvent, context: Context) {
             params: { Bucket: 'iowalight.com', Key: news3filePath, Body: bufImage }
         });
         await upload.done();
+        readStream.close();
     }
 };
