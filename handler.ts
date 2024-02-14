@@ -13,6 +13,7 @@ const {log} = console;
 exports.handler = async function (event: SQSEvent, context: Context) {
     const readdirAsync = util.promisify(fs.readdir);
     const tmpFiles = await readdirAsync('/tmp');
+    log('Files in /tmp...');
     for (const file of tmpFiles) {
         log(`File: ${file}`);
     }
