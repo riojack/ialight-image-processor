@@ -21,7 +21,9 @@ exports.handler = async function (event: SQSEvent, context: Context) {
         const news3filePath = `${s3filePathnoext}_100X100${extension}`;
         const writeStream = fs.createWriteStream(`/tmp/image_${fileName}.jpg`);
         obj.Body?.pipe(writeStream);
+        console.log(writeStream);
         const BUF = await modifyImage(writeStream);
+        console.log(writeStream);
         const upload = new Upload({
             client: s3,
             params: { Bucket: 'iowalight.com', Key: news3filePath, Body: BUF }
