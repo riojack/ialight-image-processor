@@ -22,7 +22,11 @@ export class IaLightImageProcessorStack extends cdk.Stack {
       handler: 'index.handler',
       timeout: cdk.Duration.seconds(300),
       runtime: lambda.Runtime.NODEJS_20_X,
-      environment: {NODE_OPTIONS:"--enable-source-maps"}
+      environment: {NODE_OPTIONS:"--enable-source-maps"},
+      bundling: {
+        sourceMap: true,
+        minify: true
+      }
     });
     core.Tags.of(imageProcLambda).add('description', 'Consumes an SQS record with an S3 path to an image to processed.  Applies various image transformations.');
 
