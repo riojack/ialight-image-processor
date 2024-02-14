@@ -19,7 +19,7 @@ exports.handler = async function (event: SQSEvent, context: Context) {
         const fileName = path.parse(s3filePath).name;
         const s3filePathnoext = path.basename(s3filePath, extension);
         const news3filePath = `${s3filePathnoext}_100X100${extension}`;
-        const writeStream = fs.createWriteStream(`./image_${fileName}.jpg`);
+        const writeStream = fs.createWriteStream(`/tmp/image_${fileName}.jpg`);
         obj.Body?.pipe(writeStream);
         const BUF = await modifyImage(writeStream);
         const upload = new Upload({
