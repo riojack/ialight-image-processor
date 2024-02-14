@@ -36,8 +36,8 @@ export class IaLightImageProcessorStack extends cdk.Stack {
 
     imageProcLambda.addEventSource(evtImagePathQueueToImageProcLambda);
     const s3ReadPolicy = new iam.PolicyStatement({
-      actions: ['s3:GetObject'],
-      resources: ['arn:aws:s3:::iowalight.com/*'],
+      actions: ['s3:GetObject', 's3:ListBucket'],
+      resources: ['arn:aws:s3:::iowalight.com', 'arn:aws:s3:::iowalight.com/*'],
     });
     imageProcLambda.role?.grantPrincipal.addToPrincipalPolicy(s3ReadPolicy);
   }
