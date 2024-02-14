@@ -13,13 +13,13 @@ export async function modifyImage(stream: Stream): Promise<ReadableStream> {
       });
   });
 }
+
 export async function deleteFile(filePath: string): Promise<void> {
   const unlinkAsync = util.promisify(fs.unlink);
-  try { 
-    await unlinkAsync(filePath); 
+  try {
+    await unlinkAsync(filePath);
   }
-  catch(e){
-    console.log("Encountered unlink error "+e);
+  catch (e) {
+    console.log("Encountered unlink error " + e);
   }
-  
 }
