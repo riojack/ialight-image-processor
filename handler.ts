@@ -11,6 +11,9 @@ const s3 = new S3Client({}) as NodeJsClient<S3Client>;
 const {log} = console;
 
 exports.handler = async function (event: SQSEvent, context: Context) {
+    const writeFileAsync = util.promisify(fs.writeFile);
+    await writeFileAsync('/tmp/foo.txt', 'Hello, world!');
+
     const readdirAsync = util.promisify(fs.readdir);
     const tmpFiles = await readdirAsync('/tmp');
     log('Files in /tmp...');
