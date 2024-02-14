@@ -1,5 +1,6 @@
 import cdk = require('aws-cdk-lib');
 import sqs = require('aws-cdk-lib/aws-sqs');
+import iam = require('aws-cdk-lib/aws-iam');
 import lambda = require('aws-cdk-lib/aws-lambda');
 import nodeJs = require('aws-cdk-lib/aws-lambda-nodejs');
 import core = require('aws-cdk-lib/core');
@@ -34,6 +35,11 @@ export class IaLightImageProcessorStack extends cdk.Stack {
     const evtImagePathQueueToImageProcLambda = new lambdaEventSources.SqsEventSource(imagePathQueue);
 
     imageProcLambda.addEventSource(evtImagePathQueueToImageProcLambda);
+    const s3ReadPolicy = new iam.PolicyStatement({
+      actions: ['s3:GetObject'],
+      resources: ['arn:aws:s3:::iowalight.com/*'],
+    });
+    imageProcLambda.role?.grantPrincipal.addToPrincipalPolicy(s3ReadPolicy);
   }
 }
 
