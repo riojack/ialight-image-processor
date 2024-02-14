@@ -26,7 +26,10 @@ exports.handler = async function (event: SQSEvent, context: Context) {
         const news3filePath = `${s3filePathnoext}_100X100${extension}`;
         const writeStream = fs.createWriteStream(`/tmp/image_${fileName}.jpg`);
         obj.Body?.pipe(writeStream);
-        const bufImage = await modifyImage(writeStream);
+        writeStream.close();
+        const readStream = fs.createReadStream(`/tmp/image_${fileName}.jpg`);
+        const bufImage = await modifyImage(readStream);
+        readStream.close();
         log(bufImage);
         log('---------------------');
         const tmpFiles = await readdirAsync('/tmp');
