@@ -30,18 +30,12 @@ exports.handler = async function (event: SQSEvent, context: Context) {
         const readStream = fs.createReadStream(`/tmp/image_${fileName}.jpg`);
         const bufImage = await modifyImage(readStream);
 
-        log('---------------------');
-        const tmpFiles = await readdirAsync('/tmp');
-        log('Files in /tmp...');
-        for (const file of tmpFiles) {
-            log(`File: ${file}`);
-        }
-
         const upload = new Upload({
             client: s3,
             params: { Bucket: 'iowalight.com', Key: news3filePath, Body: bufImage }
         });
         log('Heyo, it\'s Jello');
+        log(`${bufImage}`);
         await upload.done();
         log('Nope');
         readStream.close();
