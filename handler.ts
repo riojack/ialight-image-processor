@@ -19,7 +19,7 @@ exports.handler = async function (event: SQSEvent, context: Context) {
         const fileName = path.parse(s3FilePath).name;
         const dirname  = path.dirname(s3FilePath)
         const s3filePathnoext = path.basename(s3FilePath, extension);
-        const news3filePath = path.join(dirname, `${s3filePathnoext}_100X100${extension}`);
+        const news3filePath = path.join(dirname, `${s3filePathnoext}_50pct${extension}`);
         const s3File = await getFileFromS3(s3FilePath, s3Client);
 
         const s3ImageWriter = fs.createWriteStream(`/tmp/image_${fileName}.jpg`, { mode: 0o777 });

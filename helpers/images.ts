@@ -7,7 +7,7 @@ const gm = require('gm').subClass({ imageMagick: '7+' });
 export async function modifyImage(buffer: Buffer, location: string): Promise<void> {
   return new Promise((done, fail) => {
     gm(buffer)
-      .resize(100, 100)
+      .resize("50%")
       .write(location, function (err: any) {
         if (!err) {
           done();
