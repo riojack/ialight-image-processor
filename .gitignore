@@ -2,3 +2,5 @@ node_modules/
 cdk.out/
 index.js
 handler.js
+
+.DS_Store

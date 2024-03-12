@@ -2,6 +2,8 @@ import { Readable, Stream } from "stream";
 import util from "util";
 import fs from "fs";
 
+const { log } = console;
+
 const gm = require('gm').subClass({ imageMagick: '7+' });
 
 export async function modifyImage(stream: Stream): Promise<ReadableStream> {
@@ -9,12 +11,16 @@ export async function modifyImage(stream: Stream): Promise<ReadableStream> {
     gm(stream)
       .resize(100, 100)
       .stream(function (err: Error, stdout: ReadableStream, stderr: Stream) {
+        log('After resize 1')
         if (err) {
           fail(err);
+          log('After resize 2')
         }
         else {
+          log('After resize 3')
           done(stdout);
         }
+        log('After resize 10')
       });
   });
 }
