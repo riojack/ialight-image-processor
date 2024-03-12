@@ -1,32 +1,24 @@
-import { Readable, Stream } from "stream";
 import util from "util";
 import fs from "fs";
 
-const { log } = console;
-
+const unlinkAsync = util.promisify(fs.unlink);
 const gm = require('gm').subClass({ imageMagick: '7+' });
 
-export async function modifyImage(stream: Stream): Promise<ReadableStream> {
+export async function modifyImage(buffer: Buffer, location: string): Promise<void> {
   return new Promise((done, fail) => {
-    gm(stream)
+    gm(buffer)
       .resize(100, 100)
-      .stream(function (err: Error, stdout: ReadableStream, stderr: Stream) {
-        log('After resize 1')
-        if (err) {
+      .write(location, function (err: any) {
+        if (!err) {
+          done();
+        } else {
           fail(err);
-          log('After resize 2')
         }
-        else {
-          log('After resize 3')
-          done(stdout);
-        }
-        log('After resize 10')
       });
   });
 }
 
 export async function deleteFile(filePath: string): Promise<void> {
-  const unlinkAsync = util.promisify(fs.unlink);
   try {
     await unlinkAsync(filePath);
   }

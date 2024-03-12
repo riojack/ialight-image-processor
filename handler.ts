@@ -5,40 +5,36 @@ import { Context, SQSEvent } from 'aws-lambda';
 import fs from 'fs';
 import path from 'path';
 import util from 'util';
+import { finished } from 'stream/promises';
 import { modifyImage } from "./helpers/images";
+import { getFileFromS3 } from './helpers/s3';
 
-const s3 = new S3Client({}) as NodeJsClient<S3Client>;
-
-const { log } = console;
-
-const readdirAsync = util.promisify(fs.readdir);
+const s3Client = new S3Client({}) as NodeJsClient<S3Client>;
+const readFileAsync = util.promisify(fs.readFile);
 
 exports.handler = async function (event: SQSEvent, context: Context) {
     for (const record of event.Records) {
-        const s3filePath = record.body;
-        log(s3filePath);
-
-        const cmd = new GetObjectCommand({ Bucket: 'iowalight.com', Key: s3filePath });
-        const obj = await s3.send(cmd);
-        const extension = path.extname(s3filePath);
-        const fileName = path.parse(s3filePath).name;
-        const s3filePathnoext = path.basename(s3filePath, extension);
+        const s3FilePath = record.body;
+        const extension = path.extname(s3FilePath);
+        const fileName = path.parse(s3FilePath).name;
+        const s3filePathnoext = path.basename(s3FilePath, extension);
         const news3filePath = `${s3filePathnoext}_100X100${extension}`;
-        const writeStream = fs.createWriteStream(`/tmp/image_${fileName}.jpg`);
-        obj.Body?.pipe(writeStream);
-        writeStream.close();
-        const readStream = fs.createReadStream(`/tmp/image_${fileName}.jpg`);
-        const bufImage = await modifyImage(readStream);
+        const s3File = await getFileFromS3(s3FilePath, s3Client);
+
+        const s3ImageWriter = fs.createWriteStream(`/tmp/image_${fileName}.jpg`, { mode: 0o777 });
+        await s3File.pipe(s3ImageWriter);
+        await finished(s3ImageWriter);
+
+        const imageFromS3AsBuffer = await readFileAsync(`/tmp/image_${fileName}.jpg`);
+        await modifyImage(imageFromS3AsBuffer, `/tmp/image_${fileName}_resized.jpg`);
+
+        const resizedImageAsBuffer = await readFileAsync(`/tmp/image_${fileName}_resized.jpg`);
 
         const upload = new Upload({
-            client: s3,
-            params: { Bucket: 'iowalight.com', Key: news3filePath, Body: bufImage }
+            client: s3Client,
+            params: { Bucket: 'iowalight.com', Key: news3filePath, Body: resizedImageAsBuffer }
         });
-        log('Heyo, it\'s Jello');
-        log(`${bufImage}`);
+
         await upload.done();
-        log('Nope');
-        readStream.close();
-        log('Yep');
     }
 };
