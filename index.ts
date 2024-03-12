@@ -18,10 +18,13 @@ export class IaLightImageProcessorStack extends cdk.Stack {
     });
     core.Tags.of(imagePathQueue).add('description', 'Each item in this queue is the S3 path to the image to be processed.');
 
+    const lambdaLayer = lambda.LayerVersion.fromLayerVersionArn(this, 'WithImageMagick', 'arn:aws:lambda:us-east-1:614219950738:layer:WithImageMagick:1');
+    lambdaLayer.addPermission('all-use', { accountId: '614219950738' });
+
     const imageProcLambda = new nodeJs.NodejsFunction(this, 'Proc', {
       entry: './handler.ts',
       handler: 'index.handler',
-      layers: [lambda.LayerVersion.fromLayerVersionArn(this, 'WithImageMagick', 'arn:aws:lambda:us-east-1:614219950738:layer:WithImageMagick:1')],
+      layers: [lambdaLayer],
       timeout: cdk.Duration.seconds(300),
       runtime: lambda.Runtime.NODEJS_20_X,
       environment: { NODE_OPTIONS: "--enable-source-maps" },
