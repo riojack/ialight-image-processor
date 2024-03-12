@@ -41,7 +41,10 @@ exports.handler = async function (event: SQSEvent, context: Context) {
             client: s3,
             params: { Bucket: 'iowalight.com', Key: news3filePath, Body: bufImage }
         });
+        log('Heyo, it\'s Jello');
         await upload.done();
+        log('Nope');
         readStream.close();
+        log('Yep');
     }
 };
