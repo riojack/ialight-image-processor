@@ -21,9 +21,10 @@ export class IaLightImageProcessorStack extends cdk.Stack {
     const imageProcLambda = new nodeJs.NodejsFunction(this, 'Proc', {
       entry: './handler.ts',
       handler: 'index.handler',
+      layers: [lambda.LayerVersion.fromLayerVersionArn(this, 'WithImageMagick', 'arn:aws:lambda:us-east-1:614219950738:layer:WithImageMagick:1')],
       timeout: cdk.Duration.seconds(300),
       runtime: lambda.Runtime.NODEJS_20_X,
-      environment: {NODE_OPTIONS:"--enable-source-maps"},
+      environment: { NODE_OPTIONS: "--enable-source-maps" },
       ephemeralStorageSize: cdk.Size.mebibytes(2048),
       bundling: {
         sourceMap: true,
